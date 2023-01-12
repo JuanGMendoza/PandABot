@@ -4,6 +4,9 @@ from discord.ext import commands, tasks
 from random import randint
 import tools
 import datetime
+import os
+from dotenv import load_dotenv
+
 
 intents = discord.Intents().all()
 client = commands.Bot(command_prefix=".", intents=intents)
@@ -11,7 +14,7 @@ client = commands.Bot(command_prefix=".", intents=intents)
 @client.event
 async def on_ready():
 
-    birthday.start()
+    #birthday.start()
     print("ready")
 
 
@@ -33,5 +36,8 @@ async def birthday():
         await general.send("Happy birthday to " + ",".join(birthday_pandas) + "!!" )
 
 
-client.run("MTAzNzExMDM2NDg3NTI3MjIwNA.Gw5Tvh.Kc2q-SS3m1mqxUlV0ZaWDCKIDOKcFbL0idPQYE")
+load_dotenv()
+token = os.getenv("DISCORD_TOKEN")
+
+client.run(token)
 
