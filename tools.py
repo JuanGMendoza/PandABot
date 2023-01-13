@@ -37,30 +37,46 @@ def find_voice_channel(user, client):
     return None
 
 
-def check_birthdays():
-    today = datetime.date.today()
-    birthday_pandas = []
+def check_birthdays(client):
 
-    data = open("birthdays.csv", "r")
+    try:
+        today = datetime.date.today()
+        birthday_pandas = []
 
-    for line in data:
+        data = open("birthdays.csv", "r")
 
-        print(line)
-        name, birthday = line.split(",")
+        for line in data:
 
-        if name == 'Name':
-            continue
+            name, birthday = line.split(",")
+
+            if 'Birthday' in birthday:
+                continue
 
 
-        month, day = birthday.split("-")
+            month, day = birthday.split("-")
+            #print(month, day)
 
-        if today.month == int(month) and today.day == int(day):
-            birthday_pandas.append(name)
+            if today.month == int(month) and today.day == int(day):
+                birthday_pandas.append(name)
 
-    data.close()
+        data.close()
 
-    return birthday_pandas
+        return birthday_pandas
 
+    except Exception as e:
+
+        print(e)
+        #channel = await member.create_dm()
+        #await channel.send(content)
+        for member in client.guilds[0].members:
+
+            for role in member.roles:
+                if role.name == "Developer":
+                    
+                    return ["Error: " + str(e), member]
+
+        print("Error: no developer found. Please assign the developer role to someone in the server")
+        return []
 
 def get_channel(bot, name):
 

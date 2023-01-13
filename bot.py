@@ -6,7 +6,7 @@ import tools
 import datetime
 import os
 from dotenv import load_dotenv
-
+from discord.utils import get
 
 intents = discord.Intents().all()
 client = commands.Bot(command_prefix=".", intents=intents)
@@ -14,7 +14,7 @@ client = commands.Bot(command_prefix=".", intents=intents)
 @client.event
 async def on_ready():
 
-    #birthday.start()
+    await birthday.start()
     print("ready")
 
 
@@ -22,18 +22,42 @@ async def on_ready():
 @tasks.loop(hours=1)
 async def birthday():
 
-    print('here')
-    birthday_pandas = tools.check_birthdays()
-    # tools.check_birthdays() returns a list with the names whose birthday is today
-    # example: ["Kurtony", "Mornet"]
-    # check if it's 9am - time to wish a HB
+    birthday_pandas = tools.check_birthdays(client)
     hour = datetime.datetime.now().hour
 
-    print(birthday_pandas)
-    if hour == 16 and len(birthday_pandas) > 0:
-        general = tools.get_channel(client, 'bot')
+    if len(birthday_pandas) > 0:
+        if "Error" in birthday_pandas[0]:
 
-        await general.send("Happy birthday to " + ",".join(birthday_pandas) + "!!" )
+            dm = await birthday_pandas[1].create_dm()
+
+            await dm.send("Hello! there is an issue with the birthday csv file, please go check it.\n " + birthday_pandas[0])
+
+    
+
+        elif hour == 11:
+            general = tools.get_channel(client, 'announcements')
+
+            if len(birthday_pandas) == 1:
+
+                message = "Happy birthday " + birthday_pandas[0] + "! I hope you get to orbit the sun many more times"
+
+            else:
+
+                message = "Today there is an embarrasment of pandas that got older (yes, embarrasment is a group of pandas). Happy birthday to "
+
+                for panda in birthday_pandas:
+
+
+                    if panda == birthday_pandas[-1]:
+
+                        message += "and " + panda
+                    else:
+
+                        message += panda + ", "
+
+                message += "!"
+
+            await general.send(message)
 
 
 load_dotenv()
